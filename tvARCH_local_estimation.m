@@ -1,5 +1,4 @@
 function tvARCH_local_estimation
-    % إعداد البذرة العشوائية
     rng(12345);
 
     Ns = [1000, 2000, 5000];
@@ -16,10 +15,10 @@ function tvARCH_local_estimation
         for i = 1:length(u_points)
             up = u_points(i);
             w = gaussian_kernel((u - up)/h);
-            w = w(:);                % تأكد أنها عمودية
+            w = w(:);              
             w = w / sum(w);
 
-            x = x(:);                % تأكد أنها عمودية
+            x = x(:);              
             % ----- initial guesses -----
             wmean = sum(w .* (x.^2)); 
             wmean = sum(wmean);       % scalar
@@ -55,14 +54,14 @@ function tvARCH_local_estimation
         omega_true_at = omega_true(u_points);
         alpha_true_at = alpha_true(u_points);
 
-        % ----- النتائج -----
+    
         fprintf('\n=== N = %d ===\n', N);
         fprintf('SRMISE(omega): Laplace = %.4f, Gaussian = %.4f\n', ...
             srmise(omega_hat_lap, omega_true_at), srmise(omega_hat_gauss, omega_true_at));
         fprintf('SRMISE(alpha): Laplace = %.4f, Gaussian = %.4f\n', ...
             srmise(alpha_hat_lap, alpha_true_at), srmise(alpha_hat_gauss, alpha_true_at));
 
-        % ----- الرسومات -----
+        
         figure;
         subplot(2,1,1);
         plot(u_points, omega_true_at, 'k', 'LineWidth', 2); hold on;
@@ -82,7 +81,7 @@ function tvARCH_local_estimation
     end
 end
 
-% ====== الدوال المساعدة ======
+
 
 function y = gaussian_kernel(x)
     y = exp(-x.^2 / 2) ./ sqrt(2*pi);
@@ -93,7 +92,7 @@ function [x, u, omega, alpha] = simulate_tvarch1(N)
     omega = omega_true(u);
     alpha = alpha_true(u);
     df = 3; % heavy tails
-    z = trnd(df, N, 1);  % توزيعة t بدرجة حرية 3
+    z = trnd(df, N, 1);  
     x = zeros(N,1);
     x(1) = z(1) * sqrt(max(omega(1)/(1-alpha(1)),1e-6));
     for t = 2:N
@@ -115,7 +114,7 @@ function val = weighted_gauss_nll(p, x, w)
     s2 = compute_s2(omega, alpha, x);
     term = 0.5*log(s2) + 0.5 * (x.^2) ./ s2;
     val = sum(w .* term);
-    val = sum(val); % تأكد أنه scalar
+    val = sum(val);
 end
 
 function val = weighted_laplace_nll(p, x, w)
@@ -124,7 +123,7 @@ function val = weighted_laplace_nll(p, x, w)
     sigma = sqrt(s2);
     term = log(2.*sigma) + abs(x) ./ sigma;
     val = sum(w .* term);
-    val = sum(val); % تأكد أنه scalar
+    val = sum(val); 
 end
 
 function s2 = compute_s2(omega, alpha, x)
@@ -145,3 +144,4 @@ end
 function val = srmise(est, truev)
     val = sqrt(mean((est - truev).^2)) / mean(truev);
 end
+
